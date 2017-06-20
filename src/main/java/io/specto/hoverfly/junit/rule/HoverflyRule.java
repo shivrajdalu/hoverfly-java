@@ -270,6 +270,9 @@ public class HoverflyRule extends ExternalResource {
         }
         this.simulationSource = simulationSource;
         importSimulationSource();
+
+        // TODO print simulation data
+        // TODO don't import if simulation source is null or empty
     }
 
     /**
