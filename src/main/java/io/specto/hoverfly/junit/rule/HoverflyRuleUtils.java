@@ -12,6 +12,9 @@
  */
 package io.specto.hoverfly.junit.rule;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Rule;
 import org.junit.runner.Description;
 
@@ -27,6 +30,7 @@ import java.nio.file.Paths;
 class HoverflyRuleUtils {
 
     private static final String SRC_TEST_RESOURCES_HOVERFLY = "src/test/resources/hoverfly";
+    private static final ObjectWriter JSON_PRETTY_PRINTER = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     /**
      * Looks for a file in the src/test/resources/hoverfly directory with the given name
@@ -66,6 +70,15 @@ class HoverflyRuleUtils {
             }
         }
         return isRule;
+    }
+
+    static void prettyPrintJson(Object object) {
+        try {
+            System.out.println("The following simulation is imported to Hoverfly: \n"
+                    + JSON_PRETTY_PRINTER.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            throw new HoverflyRule.HoverflyRuleException("Failed to print simulation data: " + e.getMessage());
+        }
     }
 
 }
