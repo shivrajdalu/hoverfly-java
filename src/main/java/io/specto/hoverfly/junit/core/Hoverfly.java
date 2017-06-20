@@ -192,7 +192,6 @@ public class Hoverfly implements AutoCloseable {
     /**
      * Clears Hoverfly instance in case of running Hoverfly in standalone.
      */
-    // TODO where is it used?
     public void reset() {
         importSimulation(SimulationSource.empty());
     }

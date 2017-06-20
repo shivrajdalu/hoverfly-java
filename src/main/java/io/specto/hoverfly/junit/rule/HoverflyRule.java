@@ -12,8 +12,6 @@
  */
 package io.specto.hoverfly.junit.rule;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import io.specto.hoverfly.junit.core.*;
 import io.specto.hoverfly.junit.dsl.HoverflyDsl;
 import org.junit.Before;
@@ -76,7 +74,6 @@ import static io.specto.hoverfly.junit.rule.HoverflyRuleUtils.*;
 public class HoverflyRule extends ExternalResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HoverflyRule.class);
-    private static final ObjectWriter JSON_PRETTY_PRINTER = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     private final Hoverfly hoverfly;
     private final HoverflyMode hoverflyMode;
@@ -88,21 +85,17 @@ public class HoverflyRule extends ExternalResource {
         this.hoverflyMode = SIMULATE;
         this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
         this.simulationSource = simulationSource;
-        this.capturePath = null;
     }
 
     private HoverflyRule(final Path capturePath, final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
         this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
-        this.simulationSource = null;
         this.capturePath = capturePath;
     }
 
-    public HoverflyRule(final HoverflyConfig hoverflyConfig) {
+    private HoverflyRule(final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
         this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
-        this.simulationSource = null;
-        this.capturePath = null;
     }
 
     /**
@@ -133,6 +126,15 @@ public class HoverflyRule extends ExternalResource {
         }
     }
 
+    // TODO default path?
+    public static HoverflyRule inCaptureMode() {
+        return inCaptureMode(configs());
+    }
+
+    public static HoverflyRule inCaptureMode(HoverflyConfig hoverflyConfig) {
+        return new HoverflyRule(hoverflyConfig);
+    }
+
     /**
      * Instantiates a rule which runs {@link Hoverfly} in capture mode
      *
@@ -155,28 +157,6 @@ public class HoverflyRule extends ExternalResource {
         return new HoverflyRule(fileRelativeToTestResourcesHoverfly(outputFilename), hoverflyConfig);
     }
 
-    public static HoverflyRule inCaptureMode() {
-        return inCaptureMode(configs());
-    }
-
-    public static HoverflyRule inCaptureMode(HoverflyConfig hoverflyConfig) {
-        return new HoverflyRule(hoverflyConfig);
-    }
-
-
-    /**
-     * Instantiates a rule which runs {@link Hoverfly} in simulate mode
-     *
-     * @param simulationSource the simulation to import
-     * @return the rule
-     */
-    public static HoverflyRule inSimulationMode(final SimulationSource simulationSource) {
-        return inSimulationMode(simulationSource, configs());
-    }
-
-    public static HoverflyRule inSimulationMode(final SimulationSource simulationSource, final HoverflyConfig hoverflyConfig) {
-        return new HoverflyRule(simulationSource, hoverflyConfig);
-    }
 
     /**
      * Instantiates a rule which runs {@link Hoverfly} in simulate mode with no data
@@ -198,28 +178,41 @@ public class HoverflyRule extends ExternalResource {
     }
 
     /**
+     * Instantiates a rule which runs {@link Hoverfly} in simulate mode
+     *
+     * @param simulationSource the simulation to import
+     * @return the rule
+     */
+    public static HoverflyRule inSimulationMode(final SimulationSource simulationSource) {
+        return inSimulationMode(simulationSource, configs());
+    }
+
+    public static HoverflyRule inSimulationMode(final SimulationSource simulationSource, final HoverflyConfig hoverflyConfig) {
+        return new HoverflyRule(simulationSource, hoverflyConfig);
+    }
+
+    /**
      * Log warning if {@link HoverflyRule} is annotated with {@link Rule}
      */
     @Override
     public Statement apply(Statement base, Description description) {
         if (isAnnotatedWithRule(description)) {
-            LOGGER.warn("It is recommended to use HoverflyRule with @ClassRule to get better performance in your tests, and prevent known issue with Apache HttpClient. For more information, please see https://github.com/SpectoLabs/hoverfly-java.");
+            LOGGER.warn("It is recommended to use HoverflyRule with @ClassRule to get better performance in your tests, " +
+                    "and prevent known issue with Apache HttpClient. For more information, " +
+                    "please see http://hoverfly-java.readthedocs.io/en/latest/pages/misc/misc.html#apache-httpclient.");
         }
         return super.apply(base, description);
     }
 
     /**
-     * Starts in instance of Hoverfly
+     * Starts an instance of Hoverfly
      */
     @Override
     protected void before() throws Throwable {
         hoverfly.start();
 
-        importSimulationSource();
-
-        if (enableSimulationPrint) {
-            System.out.println("Hoverfly is started with the following simulation: \n"
-                    + JSON_PRETTY_PRINTER.writeValueAsString(simulationSource.getSimulation()));
+        if (hoverflyMode == SIMULATE) {
+            importSimulation();
         }
     }
 
@@ -258,21 +251,15 @@ public class HoverflyRule extends ExternalResource {
         return hoverflyMode;
     }
 
-
     /**
      * Changes the Simulation used by {@link Hoverfly}
      *
      * @param simulationSource the simulation
      */
     public void simulate(SimulationSource simulationSource) {
-        if (simulationSource == null) {
-            simulationSource = empty();
-        }
+        checkMode(SIMULATE);
         this.simulationSource = simulationSource;
-        importSimulationSource();
-
-        // TODO print simulation data
-        // TODO don't import if simulation source is null or empty
+        importSimulation();
     }
 
     /**
@@ -281,13 +268,12 @@ public class HoverflyRule extends ExternalResource {
      * @param recordFile the path where captured or simulated traffic is taken. Relative to src/test/resources/hoverfly
      */
     public void capture(final String recordFile) {
-        if (hoverfly.getMode() == CAPTURE) {
-            if (capturePath != null) {
-                hoverfly.exportSimulation(capturePath);
-            }
-            hoverfly.importSimulation(empty());
-            capturePath = fileRelativeToTestResourcesHoverfly(recordFile);
+        checkMode(CAPTURE);
+        if (capturePath != null) {
+            hoverfly.exportSimulation(capturePath);
         }
+        hoverfly.reset();
+        capturePath = fileRelativeToTestResourcesHoverfly(recordFile);
     }
 
     /**
@@ -297,7 +283,6 @@ public class HoverflyRule extends ExternalResource {
     public String getAuthHeaderName() {
         return HoverflyConstants.X_HOVERFLY_AUTHORIZATION;
     }
-
 
     /**
      * Get Bearer token used by Http client to authenticate with secured Hoverfly proxy
@@ -313,15 +298,33 @@ public class HoverflyRule extends ExternalResource {
      * @return this HoverflyRule
      */
     public HoverflyRule printSimulationData() {
-        if (hoverflyMode == SIMULATE) {
-            enableSimulationPrint = true;
-        }
+        enableSimulationPrint = true;
         return this;
     }
 
-    private void importSimulationSource() {
-        if (hoverfly.getMode() == SIMULATE) {
-            hoverfly.importSimulation(simulationSource);
+    private void checkMode(HoverflyMode mode) {
+        if (hoverflyMode != mode) {
+            throw new HoverflyRuleException("Hoverfly must be in " + mode.name() + " mode for this operation.");
+        }
+    }
+
+    private void importSimulation() {
+        if (simulationSource == null) {
+            simulationSource = empty();
+        }
+
+        hoverfly.importSimulation(simulationSource);
+
+        if (enableSimulationPrint) {
+            prettyPrintJson(simulationSource.getSimulation());
+        }
+
+    }
+
+    static class HoverflyRuleException extends RuntimeException {
+
+        HoverflyRuleException(String message) {
+            super(message);
         }
     }
 }
