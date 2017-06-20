@@ -162,6 +162,18 @@ public class HoverflyRuleDslMatcherTest {
     }
 
     @Test
+    public void shouldIgnoreHttpSchemeWhenItIsNotSet() throws Exception {
+        URI uri = UriComponentsBuilder.fromHttpUrl("https://www.always-success.com")
+                .path("/any/api/anything")
+                .build()
+                .toUri();
+        final ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+    }
+
+    @Test
     public void shouldReturn500WhenSendingRequestWithAnyMethodToTheBookingIsDownService() throws Exception {
         URI uri = UriComponentsBuilder.fromHttpUrl("http://www.booking-is-down.com")
                 .path("/api/bookings/12345")
