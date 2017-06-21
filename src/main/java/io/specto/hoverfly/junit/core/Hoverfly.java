@@ -203,7 +203,9 @@ public class Hoverfly implements AutoCloseable {
      */
     public void exportSimulation(Path path) {
 
-        if (path == null) return;
+        if (path == null) {
+            throw new IllegalArgumentException("Export path cannot be null.");
+        }
 
         LOGGER.info("Exporting simulation data from Hoverfly");
         try {
