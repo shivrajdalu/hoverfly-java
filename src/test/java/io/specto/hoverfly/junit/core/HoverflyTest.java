@@ -28,6 +28,7 @@ import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyMode.SIMULATE;
 import static io.specto.hoverfly.junit.core.SimulationSource.classpath;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.OK;
@@ -72,6 +73,16 @@ public class HoverflyTest {
         // Then
         Simulation exportedSimulation = hoverfly.getSimulation();
         assertThat(exportedSimulation).isEqualTo(importedSimulation);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenExportSimulationWithoutPath() throws Exception {
+
+        hoverfly = new Hoverfly(CAPTURE);
+
+        assertThatThrownBy(() -> hoverfly.exportSimulation(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cannot be null");
     }
 
     @Test

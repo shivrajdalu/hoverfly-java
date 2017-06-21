@@ -7,10 +7,7 @@ import io.specto.hoverfly.junit.core.model.Simulation;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import io.specto.hoverfly.webserver.CaptureModeTestWebServer;
 import org.json.JSONException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.web.client.RestTemplate;
@@ -44,10 +41,12 @@ public class CaptureModeTest {
     @AfterClass
     public static void after() throws IOException, JSONException {
 
+        // Verify captured data is expected
         final String expectedSimulation = Resources.toString(Resources.getResource(EXPECTED_SIMULATION_JSON), defaultCharset());
         final String actualSimulation = new String(Files.readAllBytes(RECORDED_SIMULATION_FILE), defaultCharset());
         JSONAssert.assertEquals(expectedSimulation, actualSimulation, JSONCompareMode.LENIENT);
 
+        // Verify headers are captured
         ObjectMapper objectMapper = new ObjectMapper();
         Simulation simulation = objectMapper.readValue(actualSimulation, Simulation.class);
         Set<RequestResponsePair> pairs = simulation.getHoverflyData().getPairs();
@@ -67,5 +66,14 @@ public class CaptureModeTest {
         // When
         restTemplate.getForObject(webServerBaseUrl, String.class);
     }
+
+
+    @Test
+    @Ignore("Currently Not Supported")
+    public void shouldRecordOtherInteractions() throws Exception {
+        // When
+        restTemplate.getForObject(webServerBaseUrl.toString() + "/other", String.class);
+    }
+
 
 }
