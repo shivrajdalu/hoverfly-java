@@ -1,12 +1,14 @@
 package io.specto.hoverfly.junit.core.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -87,6 +89,18 @@ public class FieldMatcher {
             builder.exactMatch(value);
         }
         return builder.build();
+    }
+
+    /**
+     * Get pattern which is set for any of the exact/regex matchers
+     * Throw exception if no match pattern is available.
+     */
+    @JsonIgnore
+    public String getMatchPattern() {
+        return Stream.of(exactMatch, regexMatch)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("None of the exact/regex matcher is set. "));
     }
 
     public static class Builder {

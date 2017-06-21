@@ -162,9 +162,8 @@ public class StubServiceBuilder {
      *
      * @return service destination
      */
-    // TODO it needs to support glob pattern
     String getDestination() {
-        return this.destination.getExactMatch();
+        return this.destination.getMatchPattern();
     }
     /**
      * Adds service wide delay settings.

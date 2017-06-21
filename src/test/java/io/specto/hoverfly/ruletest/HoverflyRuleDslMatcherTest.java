@@ -3,6 +3,7 @@ package io.specto.hoverfly.ruletest;
 import io.specto.hoverfly.junit.dsl.HttpBodyConverter;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import io.specto.hoverfly.models.SimpleBooking;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.http.*;
@@ -12,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
