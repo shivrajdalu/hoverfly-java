@@ -10,7 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JournalLogEntry {
+public class JournalEntry {
 
     private final Request request;
     private final Response response;
@@ -23,11 +23,11 @@ public class JournalLogEntry {
     private final Integer latency;
 
     @JsonCreator
-    public JournalLogEntry(@JsonProperty("request") Request request,
-                           @JsonProperty("response") Response response,
-                           @JsonProperty("mode") String mode,
-                           @JsonProperty("timeStarted") LocalDateTime timeStarted,
-                           @JsonProperty("latency") Integer latency) {
+    public JournalEntry(@JsonProperty("request") Request request,
+                        @JsonProperty("response") Response response,
+                        @JsonProperty("mode") String mode,
+                        @JsonProperty("timeStarted") LocalDateTime timeStarted,
+                        @JsonProperty("latency") Integer latency) {
         this.request = request;
         this.response = response;
         this.mode = mode;

@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JournalLogTest {
+public class JournalTest {
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -19,12 +19,12 @@ public class JournalLogTest {
     @Test
     public void shouldDeserializeFromJson() throws Exception {
 
-        JournalLog journalLog = objectMapper.readValue(resource, JournalLog.class);
+        Journal journal = objectMapper.readValue(resource, Journal.class);
 
 
-        assertThat(journalLog.getEntries()).hasSize(1);
+        assertThat(journal.getEntries()).hasSize(1);
 
-        JournalLogEntry logEntry = journalLog.getEntries().iterator().next();
+        JournalEntry logEntry = journal.getEntries().iterator().next();
 
         assertThat(logEntry.getMode()).isEqualTo("simulate");
         assertThat(logEntry.getRequest()).isNotNull();

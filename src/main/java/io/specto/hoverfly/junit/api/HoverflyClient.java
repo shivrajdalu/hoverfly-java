@@ -4,6 +4,7 @@ import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
 import io.specto.hoverfly.junit.core.HoverflyConstants;
 import io.specto.hoverfly.junit.core.HoverflyMode;
+import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
 
 /**
@@ -18,6 +19,7 @@ public interface HoverflyClient {
 
     void deleteSimulation();
 
+    Journal getJournal();
 
     void deleteJournal();
 
