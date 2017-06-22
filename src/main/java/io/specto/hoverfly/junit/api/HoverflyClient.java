@@ -16,6 +16,11 @@ public interface HoverflyClient {
 
     Simulation getSimulation();
 
+    void deleteSimulation();
+
+
+    void deleteJournal();
+
     HoverflyInfoView getConfigInfo();
 
     void setDestination(String destination);

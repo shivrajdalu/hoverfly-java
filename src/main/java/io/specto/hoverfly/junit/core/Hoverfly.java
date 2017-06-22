@@ -14,6 +14,7 @@ package io.specto.hoverfly.junit.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import io.specto.hoverfly.junit.api.HoverflyClientException;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
@@ -104,6 +105,8 @@ public class Hoverfly implements AutoCloseable {
 
         if (!hoverflyConfig.isRemoteInstance()) {
             startHoverflyProcess();
+        } else {
+            resetJournal();
         }
 
         waitForHoverflyToBecomeHealthy();
@@ -190,10 +193,23 @@ public class Hoverfly implements AutoCloseable {
     }
 
     /**
-     * Clears Hoverfly instance in case of running Hoverfly in standalone.
+     * Delete existing simulations and journals
      */
     public void reset() {
-        importSimulation(SimulationSource.empty());
+        hoverflyClient.deleteSimulation();
+        resetJournal();
+    }
+
+
+    /**
+     * Delete journal logs
+     */
+    public void resetJournal() {
+        try {
+            hoverflyClient.deleteJournal();
+        } catch (HoverflyClientException exception) {
+            LOGGER.warn("Older version of Hoverfly may not have a reset journal API.");
+        }
     }
 
     /**

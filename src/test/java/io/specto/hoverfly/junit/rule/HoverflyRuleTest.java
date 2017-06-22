@@ -77,6 +77,26 @@ public class HoverflyRuleTest {
         verify(mockHoverfly).close();
     }
 
+    @Test
+    public void shouldCallResetBeforeCapture() throws Exception {
+        hoverflyRule = HoverflyRule.inCaptureMode();
+        Hoverfly mockHoverfly = getHoverflyMock(hoverflyRule);
+
+        hoverflyRule.capture("test.json");
+
+        verify(mockHoverfly).reset();
+    }
+
+    @Test
+    public void shouldCallResetJournalBeforeSimulate() throws Exception {
+        hoverflyRule = HoverflyRule.inSimulationMode();
+        Hoverfly mockHoverfly = getHoverflyMock(hoverflyRule);
+
+        hoverflyRule.simulate(empty());
+
+        verify(mockHoverfly).resetJournal();
+    }
+
     private Hoverfly getHoverflyMock(HoverflyRule hoverflyRule) {
         Hoverfly mockHoverfly = mock(Hoverfly.class);
         Whitebox.setInternalState(hoverflyRule, "hoverfly", mockHoverfly);
