@@ -112,6 +112,23 @@ public class OkHttpHoverflyClientTest {
                 .hasMessageContaining("Failed to set simulation: Unexpected response (code=400, message={\"error\":\"Invalid JSON, missing \\\"meta\\\" object\"})");
     }
 
+    @Test
+    public void shouldBeAbleToDeleteAllSimulation() throws Exception {
+        URL resource = Resources.getResource("simulations/v2-simulation.json");
+        Simulation simulation = objectMapper.readValue(resource, Simulation.class);
+        client.setSimulation(simulation);
+
+        client.deleteSimulation();
+
+        Simulation result = client.getSimulation();
+        assertThat(result.getHoverflyData().getPairs()).isEmpty();
+    }
+
+    @Test
+    public void shouldBeAbleToDeleteJournal() throws Exception {
+
+    }
+
     @After
     public void tearDown() throws Exception {
         if (hoverfly != null) {

@@ -23,6 +23,7 @@ class OkHttpHoverflyClient implements HoverflyClient {
     private static final String INFO_PATH = "api/v2/hoverfly";
     private static final String DESTINATION_PATH = "api/v2/hoverfly/destination";
     private static final String MODE_PATH = "api/v2/hoverfly/mode";
+    private static final String JOURNAL_PATH = "api/v2/journal";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final MediaType JSON = MediaType.parse("application/json");
@@ -50,7 +51,6 @@ class OkHttpHoverflyClient implements HoverflyClient {
             final Request.Builder builder = createRequestBuilderWithUrl(SIMULATION_PATH);
             final RequestBody body = createRequestBody(simulation);
             final Request request = builder.put(body).build();
-
             exchange(request);
         } catch (Exception e) {
             LOGGER.warn("Failed to set simulation: {}", e.getMessage());
@@ -63,13 +63,40 @@ class OkHttpHoverflyClient implements HoverflyClient {
         try {
             final Request.Builder builder = createRequestBuilderWithUrl(SIMULATION_PATH);
             final Request request = builder.get().build();
-
             return exchange(request, Simulation.class);
         } catch (Exception e) {
             LOGGER.warn("Failed to get simulation: {}", e.getMessage());
             throw new HoverflyClientException("Failed to get simulation: " + e.getMessage());
         }
     }
+
+    @Override
+    public void deleteSimulation() {
+        try {
+            final Request.Builder builder = createRequestBuilderWithUrl(SIMULATION_PATH);
+            final Request request = builder.delete().build();
+            exchange(request);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to delete simulation: {}", e.getMessage());
+            throw new HoverflyClientException("Failed to delete simulation: " + e.getMessage());
+        }
+    }
+
+
+
+
+    @Override
+    public void deleteJournal() {
+        try {
+            final Request.Builder builder = createRequestBuilderWithUrl(JOURNAL_PATH);
+            final Request request = builder.delete().build();
+            exchange(request);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to delete journal: {}", e.getMessage());
+            throw new HoverflyClientException("Failed to delete journal: " + e.getMessage());
+        }
+    }
+
 
     @Override
     public HoverflyInfoView getConfigInfo() {
@@ -134,12 +161,14 @@ class OkHttpHoverflyClient implements HoverflyClient {
         }
     }
 
+    // Create request builder from Admin API path
     private Request.Builder createRequestBuilderWithUrl(String path) {
         return new Request.Builder()
                 .url(baseUrl.newBuilder().addPathSegments(path).build());
     }
 
 
+    // Convert object to JSON request body
     private RequestBody createRequestBody(Object data) throws JsonProcessingException {
         String content = OBJECT_MAPPER.writeValueAsString(data);
         return RequestBody.create(JSON, content);
@@ -162,6 +191,7 @@ class OkHttpHoverflyClient implements HoverflyClient {
         }
     }
 
+    // Handle non-successful response
     private void onFailure(Response response) throws IOException {
         if (!response.isSuccessful()) {
             String errorResponse = String.format("Unexpected response (code=%d, message=%s)", response.code(), response.body().string());

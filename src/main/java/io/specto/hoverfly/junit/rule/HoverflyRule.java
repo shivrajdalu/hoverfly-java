@@ -253,6 +253,7 @@ public class HoverflyRule extends ExternalResource {
 
     /**
      * Changes the Simulation used by {@link Hoverfly}
+     * It also reset the journal to ensure verification can be done on the new simulation source.
      *
      * @param simulationSource the simulation
      */
@@ -260,10 +261,11 @@ public class HoverflyRule extends ExternalResource {
         checkMode(SIMULATE);
         this.simulationSource = simulationSource;
         importSimulation();
+        hoverfly.resetJournal();
     }
 
     /**
-     * Stores what's currently been captured in the currently assigned file, wipes the simulation, then starts capture again
+     * Stores what's currently been captured in the currently assigned file, reset simulations and journal logs, then starts capture again
      * ready to store in the new file once complete.
      * @param recordFile the path where captured or simulated traffic is taken. Relative to src/test/resources/hoverfly
      */
