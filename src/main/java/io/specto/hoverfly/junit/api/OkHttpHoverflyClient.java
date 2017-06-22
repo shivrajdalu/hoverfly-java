@@ -7,6 +7,7 @@ import io.specto.hoverfly.junit.api.command.ModeCommand;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
 import io.specto.hoverfly.junit.core.HoverflyMode;
+import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -82,7 +83,17 @@ class OkHttpHoverflyClient implements HoverflyClient {
         }
     }
 
-
+    @Override
+    public Journal getJournal() {
+        try {
+            final Request.Builder builder = createRequestBuilderWithUrl(JOURNAL_PATH);
+            final Request request = builder.get().build();
+            return exchange(request, Journal.class);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get journal: {}", e.getMessage());
+            throw new HoverflyClientException("Failed to get journal: " + e.getMessage());
+        }
+    }
 
 
     @Override

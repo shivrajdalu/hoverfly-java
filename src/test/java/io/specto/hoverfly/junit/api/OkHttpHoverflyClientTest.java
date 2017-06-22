@@ -13,6 +13,7 @@ import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
 import java.util.List;
@@ -127,6 +128,19 @@ public class OkHttpHoverflyClientTest {
     @Test
     public void shouldBeAbleToDeleteJournal() throws Exception {
 
+        try {
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getForEntity("http://hoverfly.io", String.class);
+        } catch (Exception ignored) {
+            // Do nothing just to populate journal
+        }
+
+        assertThat(client.getJournal().getEntries()).isNotEmpty();
+
+        client.deleteJournal();
+
+        assertThat(client.getJournal().getEntries()).isEmpty();
     }
 
     @After

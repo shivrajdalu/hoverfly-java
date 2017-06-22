@@ -7,18 +7,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JournalLog {
+public class Journal {
 
 
-    private final List<JournalLogEntry> entries;
+    private final List<JournalEntry> entries;
 
 
     @JsonCreator
-    public JournalLog(@JsonProperty("journal") List<JournalLogEntry> entries) {
+    public Journal(@JsonProperty("journal") List<JournalEntry> entries) {
         this.entries = entries;
     }
 
-    public List<JournalLogEntry> getEntries() {
+    public List<JournalEntry> getEntries() {
         return entries;
     }
 }
