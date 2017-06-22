@@ -5,6 +5,7 @@ import ch.qos.logback.core.Appender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import io.specto.hoverfly.junit.api.HoverflyClient;
+import io.specto.hoverfly.junit.api.HoverflyClientException;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import org.apache.http.HttpResponse;
@@ -214,8 +215,7 @@ public class HoverflyTest {
         SslConfigurer sslConfigurer = mock(SslConfigurer.class);
         Whitebox.setInternalState(hoverfly, "sslConfigurer", sslConfigurer);
 
-        HoverflyClient hoverflyClient = mock(HoverflyClient.class);
-        Whitebox.setInternalState(hoverfly, "hoverflyClient", hoverflyClient);
+        HoverflyClient hoverflyClient = createMockHoverflyClient(hoverfly);
 
         when(hoverflyClient.getHealth()).thenReturn(true);
 
@@ -224,6 +224,19 @@ public class HoverflyTest {
 
         // Then
         verify(sslConfigurer).setDefaultSslContext("ssl/ca.crt");
+    }
+
+    @Test
+    public void shouldResetJournalWhenUsingARemoteHoverflyInstance() throws Exception {
+
+        hoverfly = new Hoverfly(configs().remote(), SIMULATE);
+
+        HoverflyClient hoverflyClient = createMockHoverflyClient(hoverfly);
+        when(hoverflyClient.getHealth()).thenReturn(true);
+
+        hoverfly.start();
+
+        verify(hoverflyClient).deleteJournal();
     }
 
     @Test
@@ -310,8 +323,7 @@ public class HoverflyTest {
     public void shouldSetHeadersForCaptureMode() throws Exception {
         hoverfly = new Hoverfly(configs().captureHeaders("Authorization"), CAPTURE);
 
-        HoverflyClient hoverflyClient = mock(HoverflyClient.class);
-        Whitebox.setInternalState(hoverfly, "hoverflyClient", hoverflyClient);
+        HoverflyClient hoverflyClient = createMockHoverflyClient(hoverfly);
         when(hoverflyClient.getHealth()).thenReturn(true);
 
         hoverfly.start();
@@ -328,8 +340,7 @@ public class HoverflyTest {
     public void shouldNotSetHeadersForNonCaptureMode() throws Exception {
         hoverfly = new Hoverfly(configs().captureAllHeaders(), SIMULATE);
 
-        HoverflyClient hoverflyClient = mock(HoverflyClient.class);
-        Whitebox.setInternalState(hoverfly, "hoverflyClient", hoverflyClient);
+        HoverflyClient hoverflyClient = createMockHoverflyClient(hoverfly);
         when(hoverflyClient.getHealth()).thenReturn(true);
 
         hoverfly.start();
@@ -337,11 +348,29 @@ public class HoverflyTest {
         verify(hoverflyClient, never()).setMode(eq(HoverflyMode.SIMULATE), any());
     }
 
+    @Test
+    public void shouldTolerateFailureOnResetJournal() throws Exception {
+
+        hoverfly = new Hoverfly(SIMULATE);
+        HoverflyClient hoverflyClient = createMockHoverflyClient(hoverfly);
+        doThrow(HoverflyClientException.class).when(hoverflyClient).deleteJournal();
+
+        hoverfly.resetJournal();
+
+        verify(hoverflyClient).deleteJournal();
+    }
+
     @After
     public void tearDown() throws Exception {
         if (hoverfly != null) {
             hoverfly.close();
         }
+    }
+
+    private HoverflyClient createMockHoverflyClient(Hoverfly hoverfly) {
+        HoverflyClient hoverflyClient = mock(HoverflyClient.class);
+        Whitebox.setInternalState(hoverfly, "hoverflyClient", hoverflyClient);
+        return hoverflyClient;
     }
 
     private void startDefaultHoverfly() {
