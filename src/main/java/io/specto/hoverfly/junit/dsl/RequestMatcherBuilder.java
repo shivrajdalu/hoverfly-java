@@ -43,8 +43,8 @@ public class RequestMatcherBuilder {
     private final FieldMatcher path;
     private final MultivaluedHashMap<PlainTextFieldMatcher, PlainTextFieldMatcher> queryPatterns = new MultivaluedHashMap<>();
     private final Map<String, List<String>> headers = new HashMap<>();
-    private FieldMatcher query = blankMatcher();
-    private FieldMatcher body = blankMatcher();
+    private FieldMatcher query = null;
+    private FieldMatcher body = null;
     private boolean isFuzzyMatchedQuery;
 
     RequestMatcherBuilder(final StubServiceBuilder invoker, final FieldMatcher method, final FieldMatcher scheme, final FieldMatcher destination, final FieldMatcher path) {
@@ -146,7 +146,7 @@ public class RequestMatcherBuilder {
                 .addDelaySetting(request, responseBuilder);
     }
 
-    private Request build() {
+    public Request build() {
 
         if (!this.queryPatterns.isEmpty()) {
             String queryPatterns = this.queryPatterns.entrySet().stream()
