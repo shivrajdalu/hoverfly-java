@@ -119,7 +119,7 @@ public class Request {
         this.requestType = requestType;
     }
 
-    static class Builder {
+    public static class Builder {
 
         private FieldMatcher path;
         private FieldMatcher method;
@@ -129,42 +129,42 @@ public class Request {
         private FieldMatcher body;
         private Map<String, List<String>> headers;
 
-        Builder path(FieldMatcher path) {
+        public Builder path(FieldMatcher path) {
             this.path = path;
             return this;
         }
 
-        Builder method(FieldMatcher method) {
+        public Builder method(FieldMatcher method) {
             this.method = method;
             return this;
         }
 
-        Builder destination(FieldMatcher destination) {
+        public Builder destination(FieldMatcher destination) {
             this.destination = destination;
             return this;
         }
 
-        Builder scheme(FieldMatcher scheme) {
+        public Builder scheme(FieldMatcher scheme) {
             this.scheme = scheme;
             return this;
         }
 
-        Builder query(FieldMatcher query) {
+        public Builder query(FieldMatcher query) {
             this.query = query;
             return this;
         }
 
-        Builder body(FieldMatcher body) {
+        public Builder body(FieldMatcher body) {
             this.body = body;
             return this;
         }
 
-        Builder headers(Map<String, List<String>> headers) {
+        public Builder headers(Map<String, List<String>> headers) {
             this.headers = headers;
             return this;
         }
 
-        Request build() {
+        public Request build() {
             return new Request(path, method, destination, scheme, query, body, headers);
         }
     }

@@ -147,7 +147,6 @@ public class OkHttpHoverflyClientTest {
         assertThat(client.getJournal().getEntries()).isEmpty();
     }
 
-
     @Test
     @Ignore("The fix for this test is in the verification branch")
     public void shouldBeAbleToGetJournal() throws Exception {
@@ -166,6 +165,32 @@ public class OkHttpHoverflyClientTest {
         String actual = objectMapper.writeValueAsString(journal);
 
         JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    public void shouldBeAbleToSearchJournal() throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            restTemplate.getForEntity("http://hoverfly.io", String.class);
+        } catch (Exception ignored) {
+            // Do nothing just to populate journal
+        }
+
+        try {
+            restTemplate.getForEntity("http://specto.io", String.class);
+
+        } catch (Exception ignored) {
+            // Do nothing just to populate journal
+        }
+
+
+        Journal journal = client.searchJournal(new Request.Builder()
+                .destination(FieldMatcher.wildCardMatches("hoverfly.*"))
+                .build());
+
+        assertThat(journal.getEntries()).hasSize(1);
+
+        assertThat(journal.getEntries().iterator().next().getRequest().getDestination()).isEqualTo("hoverfly.io");
     }
 
     @After
