@@ -164,7 +164,6 @@ public class HoverflyRuleDslMatcherTest {
     }
 
     @Test
-    @Ignore("Enable after new hoverfly release")
     public void shouldIgnoreHttpSchemeWhenItIsNotSet() throws Exception {
         URI uri = UriComponentsBuilder.fromHttpUrl("https://www.always-success.com")
                 .path("/any/api/anything")
