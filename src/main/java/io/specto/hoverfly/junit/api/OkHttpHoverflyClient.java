@@ -3,13 +3,15 @@ package io.specto.hoverfly.junit.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.specto.hoverfly.junit.api.command.DestinationCommand;
+import io.specto.hoverfly.junit.api.command.JournalSearchCommand;
 import io.specto.hoverfly.junit.api.command.ModeCommand;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
 import io.specto.hoverfly.junit.core.HoverflyMode;
-import io.specto.hoverfly.junit.core.model.Journal;
-import io.specto.hoverfly.junit.core.model.Simulation;
+import io.specto.hoverfly.junit.core.model.*;
 import okhttp3.*;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,19 @@ class OkHttpHoverflyClient implements HoverflyClient {
         } catch (Exception e) {
             LOGGER.warn("Failed to get journal: {}", e.getMessage());
             throw new HoverflyClientException("Failed to get journal: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Journal searchJournal(io.specto.hoverfly.junit.core.model.Request requestMatcher) {
+        try {
+            final Request.Builder builder = createRequestBuilderWithUrl(JOURNAL_PATH);
+            final RequestBody body = createRequestBody(new JournalSearchCommand(requestMatcher));
+            final Request request = builder.post(body).build();
+            return exchange(request, Journal.class);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to search journal: {}", e.getMessage());
+            throw new HoverflyClientException("Failed to search journal: " + e.getMessage());
         }
     }
 

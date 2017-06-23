@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JournalEntry {
 
-    private final Request request;
+    private final RequestDetails request;
     private final Response response;
     private final String mode;
 
@@ -23,7 +23,7 @@ public class JournalEntry {
     private final Integer latency;
 
     @JsonCreator
-    public JournalEntry(@JsonProperty("request") Request request,
+    public JournalEntry(@JsonProperty("request") RequestDetails request,
                         @JsonProperty("response") Response response,
                         @JsonProperty("mode") String mode,
                         @JsonProperty("timeStarted") LocalDateTime timeStarted,
@@ -36,7 +36,7 @@ public class JournalEntry {
     }
 
 
-    public Request getRequest() {
+    public RequestDetails getRequest() {
         return request;
     }
 

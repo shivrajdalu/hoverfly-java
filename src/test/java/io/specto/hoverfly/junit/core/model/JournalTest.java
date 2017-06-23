@@ -28,6 +28,7 @@ public class JournalTest {
 
         assertThat(logEntry.getMode()).isEqualTo("simulate");
         assertThat(logEntry.getRequest()).isNotNull();
+        assertThat(logEntry.getRequest().getDestination()).isEqualTo("hoverfly.io");
         assertThat(logEntry.getResponse()).isNotNull();
         assertThat(logEntry.getLatency()).isEqualTo(2);
         assertThat(logEntry.getTimeStarted()).isEqualTo(
