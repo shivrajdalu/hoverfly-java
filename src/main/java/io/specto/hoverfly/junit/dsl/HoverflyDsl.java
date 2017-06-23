@@ -13,6 +13,9 @@
 package io.specto.hoverfly.junit.dsl;
 
 import io.specto.hoverfly.junit.dsl.matchers.PlainTextFieldMatcher;
+import io.specto.hoverfly.junit.verification.VerificationCriteria;
+
+import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
 /**
  * Entry point to a DSL which can be used to generate a Hoverfly simulation.  Example code:
@@ -77,5 +80,4 @@ public class HoverflyDsl {
     public static ResponseBuilder response() {
         return new ResponseBuilder();
     }
-
 }

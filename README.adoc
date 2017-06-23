@@ -73,9 +73,9 @@ public void shouldBeAbleToGetABookingUsingHoverfly() {
 }
 ```
 
-Some code examples for the DSL are available https://github.com/SpectoLabs/hoverfly-java/blob/master/src/test/java/io/specto/hoverfly/ruletest/HoverflyRuleDSLTest.java[here^].
+Some code examples for the DSL are available https://github.com/SpectoLabs/hoverfly-java/blob/master/src/test/java/io/specto/hoverfly/ruletest/HoverflyDslTest.java[here^].
 
-More code examples for the DSL using request matchers can be found https://github.com/SpectoLabs/hoverfly-java/blob/master/src/test/java/io/specto/hoverfly/ruletest/HoverflyRuleDslMatcherTest.java[here^].
+More code examples for the DSL using request matchers can be found https://github.com/SpectoLabs/hoverfly-java/blob/master/src/test/java/io/specto/hoverfly/ruletest/HoverflyDslMatcherTest.java[here^].
 
 == Contributions
 

@@ -29,7 +29,7 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
-public class HoverflyRuleDslMatcherTest {
+public class HoverflyDslMatcherTest {
 
     private RestTemplate restTemplate = new RestTemplate();
 
