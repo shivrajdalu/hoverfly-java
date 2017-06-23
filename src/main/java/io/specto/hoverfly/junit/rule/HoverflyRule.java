@@ -14,6 +14,8 @@ package io.specto.hoverfly.junit.rule;
 
 import io.specto.hoverfly.junit.core.*;
 import io.specto.hoverfly.junit.dsl.HoverflyDsl;
+import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
+import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -33,6 +35,7 @@ import static io.specto.hoverfly.junit.core.HoverflyMode.SIMULATE;
 import static io.specto.hoverfly.junit.core.SimulationSource.empty;
 import static io.specto.hoverfly.junit.core.SimulationSource.file;
 import static io.specto.hoverfly.junit.rule.HoverflyRuleUtils.*;
+import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
 
 /**
@@ -83,19 +86,19 @@ public class HoverflyRule extends ExternalResource {
 
     private HoverflyRule(final SimulationSource simulationSource, final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = SIMULATE;
-        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
+        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
         this.simulationSource = simulationSource;
     }
 
     private HoverflyRule(final Path capturePath, final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
-        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
+        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
         this.capturePath = capturePath;
     }
 
     private HoverflyRule(final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
-        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
+        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
     }
 
     /**

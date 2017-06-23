@@ -18,8 +18,13 @@ import io.specto.hoverfly.junit.api.HoverflyClientException;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
+import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import io.specto.hoverfly.junit.api.HoverflyClient;
+import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
+import io.specto.hoverfly.junit.rule.HoverflyRule;
+import io.specto.hoverfly.junit.verification.VerificationCriteria;
+import io.specto.hoverfly.junit.verification.VerificationData;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +43,7 @@ import java.util.concurrent.*;
 import static io.specto.hoverfly.junit.core.HoverflyConfig.configs;
 import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyUtils.checkPortInUse;
+import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
 /**
  * A wrapper class for the Hoverfly binary.  Manage the lifecycle of the processes, and then manage Hoverfly itself by using it's API endpoints.
@@ -49,6 +55,8 @@ public class Hoverfly implements AutoCloseable {
     private static final ObjectWriter JSON_PRETTY_PRINTER = new ObjectMapper().writerWithDefaultPrettyPrinter();
     private static final int BOOT_TIMEOUT_SECONDS = 10;
     private static final int RETRY_BACKOFF_INTERVAL_MS = 100;
+
+    private static Hoverfly instance;
 
     private final HoverflyConfiguration hoverflyConfig;
     private final HoverflyMode hoverflyMode;
@@ -76,6 +84,13 @@ public class Hoverfly implements AutoCloseable {
                 .withAuthToken()
                 .build();
         this.hoverflyMode = hoverflyMode;
+
+        instance = this;
+    }
+
+    public static Hoverfly newInstance(HoverflyConfig hoverflyConfigBuilder, HoverflyMode hoverflyMode){
+        instance = new Hoverfly(hoverflyConfigBuilder, hoverflyMode);
+        return instance;
     }
 
     /**
@@ -287,11 +302,29 @@ public class Hoverfly implements AutoCloseable {
         return sslConfigurer;
     }
 
+    public static void verify(RequestMatcherBuilder requestMatcher) {
+        doVerification(requestMatcher, times(1));
+
+    }
+
+    public static void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
+        doVerification(requestMatcher, criteria);
+    }
+
+    private static void doVerification(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
+
+        // TODO null check instance
+        Journal journal = instance.hoverflyClient.searchJournal(requestMatcher.build());
+
+        criteria.verify(new VerificationData(journal));
+    }
+
+
+
     private void persistSimulation(Path path, Simulation simulation) throws IOException {
         Files.createDirectories(path.getParent());
         JSON_PRETTY_PRINTER.writeValue(path.toFile(), simulation);
     }
-
 
     /**
      * Blocks until the Hoverfly process becomes healthy, otherwise time out
@@ -310,6 +343,7 @@ public class Hoverfly implements AutoCloseable {
         }
         throw new IllegalStateException("Hoverfly has not become healthy in " + BOOT_TIMEOUT_SECONDS + " seconds");
     }
+
 
     private void cleanUp() {
         LOGGER.info("Destroying hoverfly process");
@@ -334,6 +368,4 @@ public class Hoverfly implements AutoCloseable {
         // TODO: reset default SslContext?
         tempFileManager.purge();
     }
-
-
 }
