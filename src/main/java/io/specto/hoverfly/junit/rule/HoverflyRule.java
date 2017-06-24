@@ -86,19 +86,19 @@ public class HoverflyRule extends ExternalResource {
 
     private HoverflyRule(final SimulationSource simulationSource, final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = SIMULATE;
-        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
+        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
         this.simulationSource = simulationSource;
     }
 
     private HoverflyRule(final Path capturePath, final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
-        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
+        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
         this.capturePath = capturePath;
     }
 
     private HoverflyRule(final HoverflyConfig hoverflyConfig) {
         this.hoverflyMode = CAPTURE;
-        this.hoverfly = Hoverfly.newInstance(hoverflyConfig, hoverflyMode);
+        this.hoverfly = new Hoverfly(hoverflyConfig, hoverflyMode);
     }
 
     /**
@@ -305,6 +305,14 @@ public class HoverflyRule extends ExternalResource {
     public HoverflyRule printSimulationData() {
         enableSimulationPrint = true;
         return this;
+    }
+
+    public void verify(RequestMatcherBuilder requestMatcher) {
+        hoverfly.verify(requestMatcher, times(1));
+    }
+
+    public void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
+        hoverfly.verify(requestMatcher, criteria);
     }
 
     private void checkMode(HoverflyMode mode) {
