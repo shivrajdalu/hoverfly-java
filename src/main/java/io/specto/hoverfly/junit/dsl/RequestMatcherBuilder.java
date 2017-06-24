@@ -15,6 +15,7 @@ package io.specto.hoverfly.junit.dsl;
 import io.specto.hoverfly.junit.core.model.FieldMatcher;
 import io.specto.hoverfly.junit.core.model.Request;
 import io.specto.hoverfly.junit.core.model.RequestResponsePair;
+import io.specto.hoverfly.junit.dsl.AbstractServiceBuilder.HttpMethod;
 import io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers;
 import io.specto.hoverfly.junit.dsl.matchers.PlainTextFieldMatcher;
 import io.specto.hoverfly.junit.dsl.matchers.RequestFieldMatcher;
@@ -36,23 +37,40 @@ import static org.apache.commons.lang3.CharEncoding.UTF_8;
  */
 public class RequestMatcherBuilder {
 
-    private final StubServiceBuilder invoker;
+    private StubServiceBuilder invoker;
     private final FieldMatcher method;
     private final FieldMatcher scheme;
     private final FieldMatcher destination;
     private final FieldMatcher path;
     private final MultivaluedHashMap<PlainTextFieldMatcher, PlainTextFieldMatcher> queryPatterns = new MultivaluedHashMap<>();
     private final Map<String, List<String>> headers = new HashMap<>();
-    private FieldMatcher query = null;
-    private FieldMatcher body = null;
+    private FieldMatcher query = blankMatcher();
+    private FieldMatcher body = blankMatcher();
     private boolean isFuzzyMatchedQuery;
 
-    RequestMatcherBuilder(final StubServiceBuilder invoker, final FieldMatcher method, final FieldMatcher scheme, final FieldMatcher destination, final FieldMatcher path) {
-        this.invoker = invoker;
-        this.method = method;
+
+    public RequestMatcherBuilder(final HttpMethod method,
+                                 final FieldMatcher scheme,
+                                 final FieldMatcher destination,
+                                 final PlainTextFieldMatcher path) {
+        this.method = method.getFieldMatcher();
         this.scheme = scheme;
         this.destination = destination;
-        this.path = path;
+        this.path = path.getFieldMatcher();
+        this.query = null;
+        this.body = null;
+    }
+
+    RequestMatcherBuilder(final StubServiceBuilder invoker,
+                          final HttpMethod method,
+                          final FieldMatcher scheme,
+                          final FieldMatcher destination,
+                          final PlainTextFieldMatcher path) {
+        this.invoker = invoker;
+        this.method = method.getFieldMatcher();
+        this.scheme = scheme;
+        this.destination = destination;
+        this.path = path.getFieldMatcher();
     }
 
     /**

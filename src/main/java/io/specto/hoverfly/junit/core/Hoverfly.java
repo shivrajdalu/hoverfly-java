@@ -14,15 +14,14 @@ package io.specto.hoverfly.junit.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import io.specto.hoverfly.junit.api.HoverflyClient;
 import io.specto.hoverfly.junit.api.HoverflyClientException;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
-import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
+import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
-import io.specto.hoverfly.junit.api.HoverflyClient;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
-import io.specto.hoverfly.junit.rule.HoverflyRule;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import io.specto.hoverfly.junit.verification.VerificationData;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +55,6 @@ public class Hoverfly implements AutoCloseable {
     private static final int BOOT_TIMEOUT_SECONDS = 10;
     private static final int RETRY_BACKOFF_INTERVAL_MS = 100;
 
-    private static Hoverfly instance;
 
     private final HoverflyConfiguration hoverflyConfig;
     private final HoverflyMode hoverflyMode;
@@ -85,12 +83,6 @@ public class Hoverfly implements AutoCloseable {
                 .build();
         this.hoverflyMode = hoverflyMode;
 
-        instance = this;
-    }
-
-    public static Hoverfly newInstance(HoverflyConfig hoverflyConfigBuilder, HoverflyMode hoverflyMode){
-        instance = new Hoverfly(hoverflyConfigBuilder, hoverflyMode);
-        return instance;
     }
 
     /**
@@ -302,23 +294,12 @@ public class Hoverfly implements AutoCloseable {
         return sslConfigurer;
     }
 
-    public static void verify(RequestMatcherBuilder requestMatcher) {
-        doVerification(requestMatcher, times(1));
+    public void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
 
-    }
-
-    public static void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
-        doVerification(requestMatcher, criteria);
-    }
-
-    private static void doVerification(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
-
-        // TODO null check instance
-        Journal journal = instance.hoverflyClient.searchJournal(requestMatcher.build());
+        Journal journal = hoverflyClient.searchJournal(requestMatcher.build());
 
         criteria.verify(new VerificationData(journal));
     }
-
 
 
     private void persistSimulation(Path path, Simulation simulation) throws IOException {

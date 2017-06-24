@@ -1,6 +1,5 @@
 package io.specto.hoverfly.ruletest;
 
-import io.specto.hoverfly.junit.core.Hoverfly;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import io.specto.hoverfly.models.SimpleBooking;
 import org.junit.ClassRule;
@@ -13,8 +12,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDate;
 
-import static io.specto.hoverfly.junit.core.Hoverfly.verify;
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
+import static io.specto.hoverfly.junit.dsl.HoverflyDsl.requestedForService;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
 import static io.specto.hoverfly.junit.dsl.HttpBodyConverter.json;
 import static io.specto.hoverfly.junit.dsl.ResponseCreators.success;
@@ -54,6 +53,7 @@ public class HoverflyRuleVerificationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 
-        verify(service(matches("*.flight.*")).get("/api/bookings"));
+        hoverflyRule.verify(requestedForService(matches("*.flight.*")).get("/api/bookings"));
+
     }
 }

@@ -12,25 +12,21 @@
  */
 package io.specto.hoverfly.junit.dsl;
 
-import io.specto.hoverfly.junit.core.model.*;
+import io.specto.hoverfly.junit.core.model.DelaySettings;
+import io.specto.hoverfly.junit.core.model.GlobalActions;
+import io.specto.hoverfly.junit.core.model.Request;
+import io.specto.hoverfly.junit.core.model.RequestResponsePair;
 import io.specto.hoverfly.junit.dsl.matchers.PlainTextFieldMatcher;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static io.specto.hoverfly.junit.core.model.FieldMatcher.exactlyMatches;
-import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.equalsTo;
-
 
 /**
  * Used as part of the DSL for creating a {@link RequestResponsePair} used within a Hoverfly Simulation.  Each builder is locked to a single base URL.
  */
-public class StubServiceBuilder {
+public class StubServiceBuilder extends AbstractServiceBuilder {
 
-    private static final String SEPARATOR = "://";
-
-    private final FieldMatcher destination;
-    private FieldMatcher scheme;
     private final Set<RequestResponsePair> requestResponsePairs = new HashSet<>();
     private final List<DelaySettings> delaySettings = new ArrayList<>();
 
@@ -40,99 +36,16 @@ public class StubServiceBuilder {
      * @param baseUrl the base URL of the service you are going to simulate
      */
     StubServiceBuilder(String baseUrl) {
-
-        String[] elements = baseUrl.split(SEPARATOR);
-        if (baseUrl.contains(SEPARATOR)) {
-            this.scheme = exactlyMatches(elements[0]);
-            this.destination = exactlyMatches(elements[1]);
-        } else {
-            this.destination = exactlyMatches(elements[0]);
-        }
-
+        super(baseUrl);
     }
 
     StubServiceBuilder(PlainTextFieldMatcher matcher) {
-        this.destination = matcher.getFieldMatcher();
+        super(matcher);
     }
 
-
-    /**
-     * Creating a GET request matcher
-     *
-     * @param path the path you want the matcher to have
-     * @return the {@link RequestMatcherBuilder} for further customizations
-     */
-    public RequestMatcherBuilder get(final String path) {
-        return get(equalsTo(path));
-    }
-
-    public RequestMatcherBuilder get(final PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, exactlyMatches("GET"), scheme, destination, path.getFieldMatcher());
-    }
-
-    /**
-     * Creating a DELETE request matcher
-     *
-     * @param path the path you want the matcher to have
-     * @return the {@link RequestMatcherBuilder} for further customizations
-     */
-    public RequestMatcherBuilder delete(final String path) {
-        return delete(equalsTo(path));
-    }
-
-    public RequestMatcherBuilder delete(PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, exactlyMatches("DELETE"), scheme, destination, path.getFieldMatcher());
-    }
-
-    /**
-     * Creating a PUT request matcher
-     *
-     * @param path the path you want the matcher to have
-     * @return the {@link RequestMatcherBuilder} for further customizations
-     */
-    public RequestMatcherBuilder put(final String path) {
-        return put(equalsTo(path));
-    }
-
-
-    public RequestMatcherBuilder put(PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, exactlyMatches("PUT"), scheme, destination, path.getFieldMatcher());
-    }
-
-    /**
-     * Creating a POST request matcher
-     *
-     * @param path the path you want the matcher to have
-     * @return the {@link RequestMatcherBuilder} for further customizations
-     */
-    public RequestMatcherBuilder post(final String path) {
-        return post(equalsTo(path));
-    }
-
-    public RequestMatcherBuilder post(PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, exactlyMatches("POST"), scheme, destination, path.getFieldMatcher());
-    }
-
-    /**
-     * Creating a PATCH request matcher
-     *
-     * @param path the path you want the matcher to have
-     * @return the {@link RequestMatcherBuilder} for further customizations
-     */
-    public RequestMatcherBuilder patch(final String path) {
-        return patch(equalsTo(path));
-    }
-
-    public RequestMatcherBuilder patch(PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, exactlyMatches("PATCH"), scheme, destination, path.getFieldMatcher());
-    }
-
-    public RequestMatcherBuilder anyMethod(String path) {
-        return anyMethod(equalsTo(path));
-    }
-
-    public RequestMatcherBuilder anyMethod(PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, null, scheme, destination, path.getFieldMatcher());
+    @Override
+    protected RequestMatcherBuilder createRequestMatcherBuilder(HttpMethod httpMethod, PlainTextFieldMatcher path) {
+        return new RequestMatcherBuilder(this, httpMethod, scheme, destination, path);
     }
 
     /**
