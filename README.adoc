@@ -20,6 +20,7 @@ for this is https://en.wikipedia.org/wiki/Service_virtualization[Service Virtual
 - Https automatically supported, no extra configuration required
 - Interoperable with standard Hoverfly JSON, making it easy to re-use data between Java and other native language bindings.
 - Use externally managed Hoverfly cluster for API simulations
+- Verification of expected requests have been performed
 
 == Documentation
 
@@ -77,6 +78,17 @@ Some code examples for the DSL are available https://github.com/SpectoLabs/hover
 
 More code examples for the DSL using request matchers can be found https://github.com/SpectoLabs/hoverfly-java/blob/master/src/test/java/io/specto/hoverfly/ruletest/HoverflyDslMatcherTest.java[here^].
 
+
+=== Verify requests
+```java
+
+// Verify at least one request to a specific endpoint with any query params
+hoverflyRule.verify(service(matches("*.flight.*")).get("/api/bookings").anyQueryParams(), atLeastOnce());
+
+// Verify an external service/dependency is never called
+hoverflyRule.verifyNever(service(matches("*.flight.*")));
+
+```
 == Contributions
 
 Contributions are welcome!
