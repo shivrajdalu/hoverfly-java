@@ -2,7 +2,6 @@
   "journal": [
     {
       "request": {
-        "requestType": null,
         "path": "",
         "method": "GET",
         "destination": "hoverfly.io",

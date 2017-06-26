@@ -148,7 +148,6 @@ public class OkHttpHoverflyClientTest {
     }
 
     @Test
-    @Ignore("The fix for this test is in the verification branch")
     public void shouldBeAbleToGetJournal() throws Exception {
 
         String expected = Resources.toString(Resources.getResource("expected-journal.json"), Charset.defaultCharset());
