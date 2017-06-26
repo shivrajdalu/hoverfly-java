@@ -12,10 +12,14 @@ import io.specto.hoverfly.junit.core.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
@@ -141,6 +145,27 @@ public class OkHttpHoverflyClientTest {
         client.deleteJournal();
 
         assertThat(client.getJournal().getEntries()).isEmpty();
+    }
+
+
+    @Test
+    @Ignore("The fix for this test is in the verification branch")
+    public void shouldBeAbleToGetJournal() throws Exception {
+
+        String expected = Resources.toString(Resources.getResource("expected-journal.json"), Charset.defaultCharset());
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getForEntity("http://hoverfly.io", String.class);
+        } catch (Exception ignored) {
+            // Do nothing just to populate journal
+        }
+
+
+        Journal journal = client.getJournal();
+        String actual = objectMapper.writeValueAsString(journal);
+
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
     }
 
     @After
