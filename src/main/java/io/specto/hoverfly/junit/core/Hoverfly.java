@@ -207,8 +207,8 @@ public class Hoverfly implements AutoCloseable {
     public void resetJournal() {
         try {
             hoverflyClient.deleteJournal();
-        } catch (HoverflyClientException exception) {
-            LOGGER.warn("Older version of Hoverfly may not have a reset journal API.");
+        } catch (HoverflyClientException e) {
+            LOGGER.warn("Older version of Hoverfly may not have a reset journal API", e);
         }
     }
 
