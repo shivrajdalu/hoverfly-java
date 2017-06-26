@@ -16,6 +16,7 @@ import io.specto.hoverfly.junit.core.*;
 import io.specto.hoverfly.junit.dsl.HoverflyDsl;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
 import io.specto.hoverfly.junit.dsl.StubServiceBuilder;
+import io.specto.hoverfly.junit.verification.InOrderVerification;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -281,6 +282,10 @@ public class HoverflyRule extends ExternalResource {
         capturePath = fileRelativeToTestResourcesHoverfly(recordFile);
     }
 
+    public void resetJournal() {
+        hoverfly.resetJournal();
+    }
+
     /**
      * Get custom Hoverfly header name used by Http client to authenticate with secured Hoverfly proxy
      * @return the custom Hoverfly authorization header name
@@ -317,6 +322,10 @@ public class HoverflyRule extends ExternalResource {
 
     public void verifyNever(StubServiceBuilder requestedServiceBuilder) {
         hoverfly.verifyNever(requestedServiceBuilder);
+    }
+
+    public void verifyInOrder(RequestMatcherBuilder... requestMatchers) {
+        hoverfly.verifyInOrder(requestMatchers);
     }
 
     private void checkMode(HoverflyMode mode) {
