@@ -14,7 +14,7 @@ public class JournalTest {
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private URL resource = Resources.getResource("sample-journal-logs.json");
+    private URL resource = Resources.getResource("sample-journal.json");
 
     @Test
     public void shouldDeserializeFromJson() throws Exception {

@@ -10,6 +10,7 @@ import java.util.List;
 public class Journal {
 
 
+    @JsonProperty("journal")
     private final List<JournalEntry> entries;
 
 
