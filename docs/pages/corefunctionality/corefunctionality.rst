@@ -14,6 +14,7 @@ This section describes the core functionality of Hoverfly Java.
     dsl
     matchers
     conversion
+    verification
     configuration
     ssl
     remotehoverfly

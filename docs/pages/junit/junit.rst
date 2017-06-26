@@ -60,5 +60,20 @@ File is relative to ``src/test/resources/hoverfly``.
 Use @ClassRule
 --------------
 
-It is recommended to boot Hoverfly once and share it across multiple tests by using a ``@ClassRule`` rather than ``@Rule``.  This means you don't have the overhead of starting one process per test,
+It is recommended to start Hoverfly once and share it across multiple tests by using a ``@ClassRule`` rather than ``@Rule``.  This means you don't have the overhead of starting one process per test,
 and also guarantees that all your system properties are set correctly before executing any of your test code.
+
+One caveat is that if you need to have a clean state for verification, you will need to manually reset the journal before each test:
+
+.. code-block:: java
+
+    @Before
+    public void setUp() throws Exception {
+
+        hoverflyRule.resetJournal();
+
+    }
+
+However this is not required if you are calling ``hoverflyRule.simulate`` in each test to load a new set of simulations, as the journal reset is triggered automatically in this case.
+
+

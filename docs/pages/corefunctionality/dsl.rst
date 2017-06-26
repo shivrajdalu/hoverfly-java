@@ -3,9 +3,9 @@
 DSL
 ===
 
-The rule now has fluent DSL which allows you to build request matcher to response mappings in Java opposed to importing them as JSON.
+There is a fluent DSL which allows you to build request matcher to response mappings in Java opposed to importing them as JSON.
 
-The rule is fluent and hierarchical, allowing you to define multiple service endpoints as follows:
+The DSL is fluent and hierarchical, allowing you to define multiple service endpoints as follows:
 
 .. code-block:: java
 
