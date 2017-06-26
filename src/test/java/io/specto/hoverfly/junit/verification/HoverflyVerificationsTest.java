@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class HoverflyVerificationsTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private URL resource = Resources.getResource("sample-journal-logs.json");
+    private URL resource = Resources.getResource("sample-journal.json");
     private JournalEntry journalEntry;
 
 
