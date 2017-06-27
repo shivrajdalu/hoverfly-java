@@ -2,7 +2,7 @@ package io.specto.hoverfly.ruletest;
 
 import io.specto.hoverfly.junit.dsl.HttpBodyConverter;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
-import io.specto.hoverfly.junit.verification.HoverflyVerificationException;
+import io.specto.hoverfly.junit.verification.HoverflyVerificationError;
 import io.specto.hoverfly.models.SimpleBooking;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -169,13 +169,10 @@ public class HoverflyRuleVerificationTest {
 
         restTemplate.getForEntity(uri, SimpleBooking.class);
 
-
         assertThatThrownBy(() -> hoverflyRule.verifyInOrder(
                 requestedForService("api-sandbox.flight.com").get("/api/bookings"),
                 requestedForService("api-sandbox.flight.com").put(startsWith("/api/bookings"))))
-                .isInstanceOf(HoverflyVerificationException.class)
+                .isInstanceOf(HoverflyVerificationError.class)
                 .hasMessageContaining("are not in the expected order");
     }
-
-
 }

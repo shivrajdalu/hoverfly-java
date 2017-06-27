@@ -16,7 +16,6 @@ import io.specto.hoverfly.junit.core.*;
 import io.specto.hoverfly.junit.dsl.HoverflyDsl;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
 import io.specto.hoverfly.junit.dsl.StubServiceBuilder;
-import io.specto.hoverfly.junit.verification.InOrderVerification;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import org.junit.Before;
 import org.junit.ClassRule;

@@ -1,11 +1,11 @@
 package io.specto.hoverfly.junit.verification;
 
 import io.specto.hoverfly.junit.api.HoverflyClient;
+import io.specto.hoverfly.junit.core.model.JournalEntry;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
@@ -21,21 +21,34 @@ public class InOrderVerification {
     }
 
     public void verify() {
-
+        List<JournalEntry> journalEntries = new LinkedList<>();
         requestMatchers.stream()
                 .map(RequestMatcherBuilder::build)
                 .map(request -> hoverflyClient.searchJournal(request))
                 .map(VerificationData::new)
                 .map(data -> {
                     times(1).verify(data);
-                    return data.getJournal().getEntries().iterator().next().getTimeStarted();
+                    JournalEntry entry = data.getJournal().getEntries().iterator().next();
+                    journalEntries.add(entry);
+                    return entry.getTimeStarted();
                 })
                 .reduce((last, current) -> {
-                    if (current.isEqual(last) || current.isAfter(last)) {
-                        return current;
+                    if (current.isBefore(last)) {
+                        throw new HoverflyVerificationError(getErrorMessage(journalEntries));
                     } else {
-                        throw new HoverflyVerificationException("The requests are not in the expected order.");
+                        return current;
                     }
                 });
+    }
+
+    private String getErrorMessage(List<JournalEntry> journalEntries) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("The requests are not in the expected order:").append("\n\n");
+        String requests = journalEntries.stream()
+                .sorted(Comparator.comparing(JournalEntry::getTimeStarted))
+                .map(VerificationUtils::format)
+                .collect(Collectors.joining("\n"));
+        return sb.append(requests).toString();
+
     }
 }
