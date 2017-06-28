@@ -3,7 +3,7 @@
 DSL
 ===
 
-There is a fluent DSL which allows you to build request matcher to response mappings in Java opposed to importing them as JSON.
+Hoverfly Java has a DSL which allows you to build request matcher to response mappings in Java instead of importing them as JSON.
 
 The DSL is fluent and hierarchical, allowing you to define multiple service endpoints as follows:
 
