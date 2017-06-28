@@ -311,7 +311,7 @@ public class HoverflyRule extends ExternalResource {
     }
 
     public void verify(RequestMatcherBuilder requestMatcher) {
-        hoverfly.verify(requestMatcher, times(1));
+        hoverfly.verify(requestMatcher);
     }
 
     public void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
@@ -319,7 +319,7 @@ public class HoverflyRule extends ExternalResource {
     }
 
     public void verifyNever(RequestedServiceBuilder requestedServiceBuilder) {
-        hoverfly.verify(requestedServiceBuilder.anyMethod(any()), never());
+        hoverfly.verifyNever(requestedServiceBuilder);
     }
 
     private void checkMode(HoverflyMode mode) {
