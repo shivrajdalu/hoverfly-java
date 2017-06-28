@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.net.URL;
 import java.time.LocalDateTime;
 
-import static io.specto.hoverfly.junit.dsl.HoverflyDsl.requestedForService;
+import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
 import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.matches;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -48,7 +48,7 @@ public class InOrderVerificationTest {
 
     @Test
     public void shouldVerifyRequestHasBeenMadeExactlyOnce() throws Exception {
-        RequestMatcherBuilder rmb = requestedForService(matches("api*.com")).get("/v2");
+        RequestMatcherBuilder rmb = service(matches("api*.com")).get("/v2");
         inOrder = new InOrderVerification(hoverflyClient, rmb);
 
         when(hoverflyClient.searchJournal(rmb.build())).thenReturn(new Journal(Lists.newArrayList(journalEntry)));
@@ -59,7 +59,7 @@ public class InOrderVerificationTest {
 
     @Test
     public void shouldThrowExceptionIfRequestsHasBeenMadeMoreThanOnce() throws Exception {
-        RequestMatcherBuilder rmb = requestedForService(matches("api*.com")).get("/v2");
+        RequestMatcherBuilder rmb = service(matches("api*.com")).get("/v2");
         inOrder = new InOrderVerification(hoverflyClient, rmb);
 
         when(hoverflyClient.searchJournal(rmb.build())).thenReturn(new Journal(Lists.newArrayList(journalEntry, journalEntry)));
@@ -73,8 +73,8 @@ public class InOrderVerificationTest {
         JournalEntry journalEntry1 = getJournalEntry(LocalDateTime.of(2017, 6, 24, 3, 15, 2), "GET");
         JournalEntry journalEntry2 = getJournalEntry(LocalDateTime.of(2017, 6, 24, 3, 15, 1), "PUT");
 
-        RequestMatcherBuilder rmb1 = requestedForService(matches("*hoverfly.*")).get("/v2");
-        RequestMatcherBuilder rmb2 = requestedForService(matches("*hoverfly.*")).put("/v2");
+        RequestMatcherBuilder rmb1 = service(matches("*hoverfly.*")).get("/v2");
+        RequestMatcherBuilder rmb2 = service(matches("*hoverfly.*")).put("/v2");
         inOrder = new InOrderVerification(hoverflyClient, rmb1, rmb2);
 
         when(hoverflyClient.searchJournal(rmb1.build())).thenReturn(new Journal(Lists.newArrayList(journalEntry1)));

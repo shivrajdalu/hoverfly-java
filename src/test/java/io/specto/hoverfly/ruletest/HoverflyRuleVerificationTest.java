@@ -145,8 +145,8 @@ public class HoverflyRuleVerificationTest {
         restTemplate.getForEntity(uri, SimpleBooking.class);
 
         hoverflyRule.verifyInOrder(
-                requestedForService("api-sandbox.flight.com").put(startsWith("/api/bookings")),
-                requestedForService("api-sandbox.flight.com").get("/api/bookings"));
+                service("api-sandbox.flight.com").put(startsWith("/api/bookings")).anyBody(),
+                service("api-sandbox.flight.com").get("/api/bookings").anyQueryParams());
     }
 
 
@@ -170,8 +170,8 @@ public class HoverflyRuleVerificationTest {
         restTemplate.getForEntity(uri, SimpleBooking.class);
 
         assertThatThrownBy(() -> hoverflyRule.verifyInOrder(
-                requestedForService("api-sandbox.flight.com").get("/api/bookings"),
-                requestedForService("api-sandbox.flight.com").put(startsWith("/api/bookings"))))
+                service("api-sandbox.flight.com").get("/api/bookings").anyQueryParams(),
+                service("api-sandbox.flight.com").put(startsWith("/api/bookings")).anyBody()))
                 .isInstanceOf(HoverflyVerificationError.class)
                 .hasMessageContaining("are not in the expected order");
     }
