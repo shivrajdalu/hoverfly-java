@@ -22,6 +22,7 @@ import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
+import io.specto.hoverfly.junit.dsl.RequestedServiceBuilder;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import io.specto.hoverfly.junit.verification.VerificationData;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,8 @@ import java.util.concurrent.*;
 import static io.specto.hoverfly.junit.core.HoverflyConfig.configs;
 import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyUtils.checkPortInUse;
+import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.any;
+import static io.specto.hoverfly.junit.verification.HoverflyVerifications.never;
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
 /**
@@ -299,6 +302,14 @@ public class Hoverfly implements AutoCloseable {
         Journal journal = hoverflyClient.searchJournal(requestMatcher.build());
 
         criteria.verify(new VerificationData(journal));
+    }
+
+    public void verify(RequestMatcherBuilder requestMatcher) {
+        verify(requestMatcher, times(1));
+    }
+
+    public void verifyNever(RequestedServiceBuilder requestedServiceBuilder) {
+        verify(requestedServiceBuilder.anyMethod(any()), never());
     }
 
 
