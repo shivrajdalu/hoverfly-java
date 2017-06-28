@@ -15,7 +15,6 @@ package io.specto.hoverfly.junit.dsl;
 import io.specto.hoverfly.junit.core.model.FieldMatcher;
 import io.specto.hoverfly.junit.core.model.Request;
 import io.specto.hoverfly.junit.core.model.RequestResponsePair;
-import io.specto.hoverfly.junit.dsl.AbstractServiceBuilder.HttpMethod;
 import io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers;
 import io.specto.hoverfly.junit.dsl.matchers.PlainTextFieldMatcher;
 import io.specto.hoverfly.junit.dsl.matchers.RequestFieldMatcher;
@@ -49,20 +48,8 @@ public class RequestMatcherBuilder {
     private boolean isFuzzyMatchedQuery;
 
 
-    public RequestMatcherBuilder(final HttpMethod method,
-                                 final FieldMatcher scheme,
-                                 final FieldMatcher destination,
-                                 final PlainTextFieldMatcher path) {
-        this.method = method.getFieldMatcher();
-        this.scheme = scheme;
-        this.destination = destination;
-        this.path = path.getFieldMatcher();
-        this.query = null;
-        this.body = null;
-    }
-
     RequestMatcherBuilder(final StubServiceBuilder invoker,
-                          final HttpMethod method,
+                          final StubServiceBuilder.HttpMethod method,
                           final FieldMatcher scheme,
                           final FieldMatcher destination,
                           final PlainTextFieldMatcher path) {

@@ -15,7 +15,7 @@ package io.specto.hoverfly.junit.rule;
 import io.specto.hoverfly.junit.core.*;
 import io.specto.hoverfly.junit.dsl.HoverflyDsl;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
-import io.specto.hoverfly.junit.dsl.RequestedServiceBuilder;
+import io.specto.hoverfly.junit.dsl.StubServiceBuilder;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -35,10 +35,7 @@ import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyMode.SIMULATE;
 import static io.specto.hoverfly.junit.core.SimulationSource.empty;
 import static io.specto.hoverfly.junit.core.SimulationSource.file;
-import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.any;
 import static io.specto.hoverfly.junit.rule.HoverflyRuleUtils.*;
-import static io.specto.hoverfly.junit.verification.HoverflyVerifications.never;
-import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
 
 /**
@@ -318,7 +315,7 @@ public class HoverflyRule extends ExternalResource {
         hoverfly.verify(requestMatcher, criteria);
     }
 
-    public void verifyNever(RequestedServiceBuilder requestedServiceBuilder) {
+    public void verifyNever(StubServiceBuilder requestedServiceBuilder) {
         hoverfly.verifyNever(requestedServiceBuilder);
     }
 

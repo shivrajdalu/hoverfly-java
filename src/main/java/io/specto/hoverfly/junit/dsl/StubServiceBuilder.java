@@ -12,23 +12,110 @@
  */
 package io.specto.hoverfly.junit.dsl;
 
-import io.specto.hoverfly.junit.core.model.DelaySettings;
-import io.specto.hoverfly.junit.core.model.GlobalActions;
-import io.specto.hoverfly.junit.core.model.Request;
-import io.specto.hoverfly.junit.core.model.RequestResponsePair;
+import io.specto.hoverfly.junit.core.model.*;
 import io.specto.hoverfly.junit.dsl.matchers.PlainTextFieldMatcher;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static io.specto.hoverfly.junit.core.model.FieldMatcher.exactlyMatches;
+import static io.specto.hoverfly.junit.dsl.StubServiceBuilder.HttpMethod.*;
+import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.equalsTo;
+
 
 /**
  * Used as part of the DSL for creating a {@link RequestResponsePair} used within a Hoverfly Simulation.  Each builder is locked to a single base URL.
  */
-public class StubServiceBuilder extends AbstractServiceBuilder {
+public class StubServiceBuilder {
 
     private final Set<RequestResponsePair> requestResponsePairs = new HashSet<>();
     private final List<DelaySettings> delaySettings = new ArrayList<>();
+
+    private static final String SEPARATOR = "://";
+    protected final FieldMatcher destination;
+    protected FieldMatcher scheme;
+
+
+    /**
+     * Creating a GET request matcher
+     *
+     * @param path the path you want the matcher to have
+     * @return the {@link RequestMatcherBuilder} for further customizations
+     */
+    public RequestMatcherBuilder get(final String path) {
+        return get(equalsTo(path));
+    }
+
+
+    public RequestMatcherBuilder get(final PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(GET, path);
+    }
+
+    /**
+     * Creating a DELETE request matcher
+     *
+     * @param path the path you want the matcher to have
+     * @return the {@link RequestMatcherBuilder} for further customizations
+     */
+    public RequestMatcherBuilder delete(final String path) {
+        return delete(equalsTo(path));
+    }
+
+    public RequestMatcherBuilder delete(PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(DELETE, path);
+    }
+
+    /**
+     * Creating a PUT request matcher
+     *
+     * @param path the path you want the matcher to have
+     * @return the {@link RequestMatcherBuilder} for further customizations
+     */
+    public RequestMatcherBuilder put(final String path) {
+        return put(equalsTo(path));
+    }
+
+
+    public RequestMatcherBuilder put(PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(PUT, path);
+    }
+
+    /**
+     * Creating a POST request matcher
+     *
+     * @param path the path you want the matcher to have
+     * @return the {@link RequestMatcherBuilder} for further customizations
+     */
+    public RequestMatcherBuilder post(final String path) {
+        return post(equalsTo(path));
+    }
+
+    public RequestMatcherBuilder post(PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(POST, path);
+    }
+
+    /**
+     * Creating a PATCH request matcher
+     *
+     * @param path the path you want the matcher to have
+     * @return the {@link RequestMatcherBuilder} for further customizations
+     */
+    public RequestMatcherBuilder patch(final String path) {
+        return patch(equalsTo(path));
+    }
+
+    public RequestMatcherBuilder patch(PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(PATCH, path);
+    }
+
+    public RequestMatcherBuilder anyMethod(String path) {
+        return anyMethod(equalsTo(path));
+    }
+
+    public RequestMatcherBuilder anyMethod(PlainTextFieldMatcher path) {
+        return createRequestMatcherBuilder(ANY, path);
+    }
+
 
     /**
      * Instantiates builder for a given base URL
@@ -36,16 +123,17 @@ public class StubServiceBuilder extends AbstractServiceBuilder {
      * @param baseUrl the base URL of the service you are going to simulate
      */
     StubServiceBuilder(String baseUrl) {
-        super(baseUrl);
+        String[] elements = baseUrl.split(SEPARATOR);
+        if (baseUrl.contains(SEPARATOR)) {
+            this.scheme = exactlyMatches(elements[0]);
+            this.destination = exactlyMatches(elements[1]);
+        } else {
+            this.destination = exactlyMatches(elements[0]);
+        }
     }
 
     StubServiceBuilder(PlainTextFieldMatcher matcher) {
-        super(matcher);
-    }
-
-    @Override
-    protected RequestMatcherBuilder createRequestMatcherBuilder(HttpMethod httpMethod, PlainTextFieldMatcher path) {
-        return new RequestMatcherBuilder(this, httpMethod, scheme, destination, path);
+        this.destination = matcher.getFieldMatcher();
     }
 
     /**
@@ -78,6 +166,7 @@ public class StubServiceBuilder extends AbstractServiceBuilder {
     String getDestination() {
         return this.destination.getMatchPattern();
     }
+
     /**
      * Adds service wide delay settings.
      *
@@ -97,7 +186,6 @@ public class StubServiceBuilder extends AbstractServiceBuilder {
     public List<DelaySettings> getDelaySettings() {
         return Collections.unmodifiableList(this.delaySettings);
     }
-
     void addDelaySetting(final DelaySettings delaySettings) {
         if (delaySettings != null) {
             this.delaySettings.add(delaySettings);
@@ -107,5 +195,29 @@ public class StubServiceBuilder extends AbstractServiceBuilder {
     StubServiceBuilder addDelaySetting(final Request request, final ResponseBuilder responseBuilder) {
         responseBuilder.addDelay().to(this).forRequest(request);
         return this;
+    }
+
+    private RequestMatcherBuilder createRequestMatcherBuilder(HttpMethod httpMethod, PlainTextFieldMatcher path) {
+        return new RequestMatcherBuilder(this, httpMethod, scheme, destination, path);
+    }
+
+    enum HttpMethod {
+        GET,
+        PUT,
+        POST,
+        DELETE,
+        PATCH,
+        OPTIONS,
+        CONNECT,
+        HEAD,
+        ANY;
+
+        FieldMatcher getFieldMatcher() {
+            FieldMatcher fieldMatcher = null;
+            if (this != ANY) {
+                fieldMatcher = exactlyMatches(this.name());
+            }
+            return fieldMatcher;
+        }
     }
 }

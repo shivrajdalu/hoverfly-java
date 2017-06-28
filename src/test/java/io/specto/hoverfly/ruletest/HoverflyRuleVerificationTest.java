@@ -15,13 +15,11 @@ import java.net.URI;
 import java.time.LocalDate;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
-import static io.specto.hoverfly.junit.dsl.HoverflyDsl.requestedForService;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
 import static io.specto.hoverfly.junit.dsl.HttpBodyConverter.json;
 import static io.specto.hoverfly.junit.dsl.ResponseCreators.success;
 import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.*;
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.never;
-import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -62,7 +60,7 @@ public class HoverflyRuleVerificationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 
-        hoverflyRule.verify(requestedForService(matches("*.flight.*")).get("/api/bookings").anyQueryParams());
+        hoverflyRule.verify(service(matches("*.flight.*")).get("/api/bookings").anyQueryParams());
 
     }
 
@@ -82,7 +80,7 @@ public class HoverflyRuleVerificationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        hoverflyRule.verify(requestedForService(matches("*.flight.*")).get("/api/bookings").header("Authorization", "Bearer some-token"), never());
+        hoverflyRule.verify(service(matches("*.flight.*")).get("/api/bookings").header("Authorization", "Bearer some-token"), never());
     }
 
     @Test
@@ -95,7 +93,7 @@ public class HoverflyRuleVerificationTest {
 
         assertThat(bookFlightResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        hoverflyRule.verify(requestedForService("http://api-sandbox.flight.com").put("/api/bookings/1").body(json(booking)));
+        hoverflyRule.verify(service("http://api-sandbox.flight.com").put("/api/bookings/1").body(json(booking)));
     }
 
     @Test
@@ -113,7 +111,7 @@ public class HoverflyRuleVerificationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        hoverflyRule.verifyNever(requestedForService(matches("api.flight.*")));
+        hoverflyRule.verifyNever(service(matches("api.flight.*")));
 
 
     }
