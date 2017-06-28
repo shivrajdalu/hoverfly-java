@@ -22,7 +22,7 @@ import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.core.model.Journal;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
-import io.specto.hoverfly.junit.dsl.RequestedServiceBuilder;
+import io.specto.hoverfly.junit.dsl.StubServiceBuilder;
 import io.specto.hoverfly.junit.verification.VerificationCriteria;
 import io.specto.hoverfly.junit.verification.VerificationData;
 import org.apache.commons.lang3.StringUtils;
@@ -308,7 +308,7 @@ public class Hoverfly implements AutoCloseable {
         verify(requestMatcher, times(1));
     }
 
-    public void verifyNever(RequestedServiceBuilder requestedServiceBuilder) {
+    public void verifyNever(StubServiceBuilder requestedServiceBuilder) {
         verify(requestedServiceBuilder.anyMethod(any()), never());
     }
 
