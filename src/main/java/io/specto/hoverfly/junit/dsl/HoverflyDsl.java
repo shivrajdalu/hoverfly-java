@@ -73,14 +73,6 @@ public class HoverflyDsl {
         return new StubServiceBuilder(matcher);
     }
 
-    public static RequestedServiceBuilder requestedForService(final String baseUrl) {
-        return new RequestedServiceBuilder(baseUrl);
-    }
-
-    public static RequestedServiceBuilder requestedForService(final PlainTextFieldMatcher matcher) {
-        return new RequestedServiceBuilder(matcher);
-    }
-
     /**
      * Instantiates a new instance
      * @return the builder
