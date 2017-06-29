@@ -1,9 +1,11 @@
 package io.specto.hoverfly.ruletest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.specto.hoverfly.junit.dsl.HttpBodyConverter;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import io.specto.hoverfly.junit.verification.HoverflyVerificationError;
 import io.specto.hoverfly.models.SimpleBooking;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
@@ -22,6 +25,7 @@ import static io.specto.hoverfly.junit.dsl.ResponseCreators.success;
 import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.*;
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.never;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class HoverflyRuleVerificationTest {
@@ -45,18 +49,15 @@ public class HoverflyRuleVerificationTest {
 
     )).printSimulationData();
 
+    @Before
+    public void setUp() throws Exception {
+        hoverflyRule.resetJournal();
+    }
+
     @Test
     public void shouldVerifyRequestHasBeenMadeExactlyOnce() throws Exception {
 
-        URI uri = UriComponentsBuilder.fromHttpUrl("http://api-sandbox.flight.com")
-                .path("/api/bookings")
-                .queryParam("airline", "Pacific Air")
-                .queryParam("page", 1)
-                .queryParam("size", 10)
-                .build()
-                .toUri();
-
-        ResponseEntity<SimpleBooking> response = restTemplate.getForEntity(uri, SimpleBooking.class);
+        ResponseEntity<SimpleBooking> response = getBookings();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -65,32 +66,20 @@ public class HoverflyRuleVerificationTest {
 
     }
 
-
     @Test
     public void shouldVerifyRequestHasNeverBeenMade() throws Exception {
 
-        URI uri = UriComponentsBuilder.fromHttpUrl("http://api-sandbox.flight.com")
-                .path("/api/bookings")
-                .queryParam("airline", "Pacific Air")
-                .queryParam("page", 1)
-                .queryParam("size", 10)
-                .build()
-                .toUri();
-
-        ResponseEntity<SimpleBooking> response = restTemplate.getForEntity(uri, SimpleBooking.class);
+        ResponseEntity<SimpleBooking> response = getBookings();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         hoverflyRule.verify(service(matches("*.flight.*")).get("/api/bookings").header("Authorization", "Bearer some-token"), never());
     }
 
+
     @Test
     public void shouldVerifyRequestWithAJsonBody() throws Exception {
-        RequestEntity<String> bookFlightRequest = RequestEntity.put(new URI("http://api-sandbox.flight.com/api/bookings/1"))
-                .contentType(APPLICATION_JSON)
-                .body(HttpBodyConverter.OBJECT_MAPPER.writeValueAsString(booking));
-
-        ResponseEntity<String> bookFlightResponse = restTemplate.exchange(bookFlightRequest, String.class);
+        ResponseEntity<String> bookFlightResponse = putBooking();
 
         assertThat(bookFlightResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -100,6 +89,51 @@ public class HoverflyRuleVerificationTest {
     @Test
     public void shouldVerifyNeverRequestedForAService() throws Exception {
 
+        ResponseEntity<SimpleBooking> response = getBookings();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        hoverflyRule.verifyZeroRequestTo(service(matches("api.flight.*")));
+    }
+
+    @Test
+    public void shouldVerifyAllRequestsHaveBeenMade() throws Exception {
+
+        getBookings();
+        putBooking();
+
+        hoverflyRule.verifyAll();
+    }
+
+    @Test
+    public void shouldThrowExceptionIfVerifyAllFailed() throws Exception {
+
+
+       assertThatThrownBy(() -> hoverflyRule.verifyAll())
+               .isInstanceOf(HoverflyVerificationError.class)
+               .hasMessageContaining("Expected at least 1 request:\n" +
+               "{\n" +
+               "  \"path\" : {\n" +
+               "    \"exactMatch\" : \"/api/bookings/1\"\n" +
+               "  },\n" +
+               "  \"method\" : {\n" +
+               "    \"exactMatch\" : \"PUT\"\n" +
+               "  },\n" +
+               "  \"destination\" : {\n" +
+               "    \"globMatch\" : \"api*.flight.com\"\n" +
+               "  },\n" +
+               "  \"query\" : {\n" +
+               "    \"exactMatch\" : \"\"\n" +
+               "  },\n" +
+               "  \"body\" : {\n" +
+               "    \"jsonMatch\" : \"{\\\"id\\\":1,\\\"origin\\\":\\\"London\\\",\\\"destination\\\":\\\"Hong Kong\\\",\\\"date\\\":\\\"2017-06-29\\\"}\"\n" +
+               "  }\n" +
+               "}\n" +
+               "\n" +
+               "But actual number of requests is 0.");
+    }
+
+    private ResponseEntity<SimpleBooking> getBookings() {
         URI uri = UriComponentsBuilder.fromHttpUrl("http://api-sandbox.flight.com")
                 .path("/api/bookings")
                 .queryParam("airline", "Pacific Air")
@@ -108,12 +142,15 @@ public class HoverflyRuleVerificationTest {
                 .build()
                 .toUri();
 
-        ResponseEntity<SimpleBooking> response = restTemplate.getForEntity(uri, SimpleBooking.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        hoverflyRule.verifyNever(service(matches("api.flight.*")));
+        return restTemplate.getForEntity(uri, SimpleBooking.class);
+    }
 
 
+    private ResponseEntity<String> putBooking() throws URISyntaxException, JsonProcessingException {
+        RequestEntity<String> bookFlightRequest = RequestEntity.put(new URI("http://api-sandbox.flight.com/api/bookings/1"))
+                .contentType(APPLICATION_JSON)
+                .body(HttpBodyConverter.OBJECT_MAPPER.writeValueAsString(booking));
+
+        return restTemplate.exchange(bookFlightRequest, String.class);
     }
 }
