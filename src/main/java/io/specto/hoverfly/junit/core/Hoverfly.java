@@ -20,6 +20,8 @@ import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
 import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.core.model.Journal;
+import io.specto.hoverfly.junit.core.model.Request;
+import io.specto.hoverfly.junit.core.model.RequestResponsePair;
 import io.specto.hoverfly.junit.core.model.Simulation;
 import io.specto.hoverfly.junit.dsl.RequestMatcherBuilder;
 import io.specto.hoverfly.junit.dsl.StubServiceBuilder;
@@ -44,6 +46,7 @@ import static io.specto.hoverfly.junit.core.HoverflyConfig.configs;
 import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyUtils.checkPortInUse;
 import static io.specto.hoverfly.junit.dsl.matchers.HoverflyMatchers.any;
+import static io.specto.hoverfly.junit.verification.HoverflyVerifications.atLeastOnce;
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.never;
 import static io.specto.hoverfly.junit.verification.HoverflyVerifications.times;
 
@@ -298,25 +301,36 @@ public class Hoverfly implements AutoCloseable {
     }
 
     public void verify(RequestMatcherBuilder requestMatcher, VerificationCriteria criteria) {
-
-        Journal journal = hoverflyClient.searchJournal(requestMatcher.build());
-
-        criteria.verify(new VerificationData(journal));
+        verifyRequest(requestMatcher.build(), criteria);
     }
 
     public void verify(RequestMatcherBuilder requestMatcher) {
         verify(requestMatcher, times(1));
     }
 
-    public void verifyNever(StubServiceBuilder requestedServiceBuilder) {
+    public void verifyZeroRequestTo(StubServiceBuilder requestedServiceBuilder) {
         verify(requestedServiceBuilder.anyMethod(any()), never());
     }
 
+
+    public void verifyAll() {
+        Simulation simulation = hoverflyClient.getSimulation();
+        simulation.getHoverflyData().getPairs().stream()
+                .map(RequestResponsePair::getRequest)
+                .forEach(request -> verifyRequest(request, atLeastOnce()));
+    }
+
+    private void verifyRequest(Request request, VerificationCriteria criteria) {
+        Journal journal = hoverflyClient.searchJournal(request);
+
+        criteria.verify(request, new VerificationData(journal));
+    }
 
     private void persistSimulation(Path path, Simulation simulation) throws IOException {
         Files.createDirectories(path.getParent());
         JSON_PRETTY_PRINTER.writeValue(path.toFile(), simulation);
     }
+
 
     /**
      * Blocks until the Hoverfly process becomes healthy, otherwise time out
@@ -335,7 +349,6 @@ public class Hoverfly implements AutoCloseable {
         }
         throw new IllegalStateException("Hoverfly has not become healthy in " + BOOT_TIMEOUT_SECONDS + " seconds");
     }
-
 
     private void cleanUp() {
         LOGGER.info("Destroying hoverfly process");

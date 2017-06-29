@@ -315,8 +315,16 @@ public class HoverflyRule extends ExternalResource {
         hoverfly.verify(requestMatcher, criteria);
     }
 
-    public void verifyNever(StubServiceBuilder requestedServiceBuilder) {
-        hoverfly.verifyNever(requestedServiceBuilder);
+    public void verifyZeroRequestTo(StubServiceBuilder requestedServiceBuilder) {
+        hoverfly.verifyZeroRequestTo(requestedServiceBuilder);
+    }
+
+    public void verifyAll() {
+        hoverfly.verifyAll();
+    }
+
+    public void resetJournal() {
+        hoverfly.resetJournal();
     }
 
     private void checkMode(HoverflyMode mode) {

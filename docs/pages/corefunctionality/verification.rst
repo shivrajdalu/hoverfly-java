@@ -37,12 +37,18 @@ There are some useful ``VerificationCriteria`` static factory methods provided o
     atMost(2),
     never()
 
+If you want to verify all the stubbed requests were made at least once, you can use ``verifyAll``:
+
+.. code-block:: java
+
+    hoverfly.verifyAll();
+
 
 You can also verify that an external service has never been called:
 
 .. code-block:: java
 
-    hoverfly.verifyNever(service(matches("api.flight.*")));
+    hoverfly.verifyZeroRequestTo(service(matches("api.flight.*")));
 
 
 You can call ``verify`` as many times as you want, but requests are not verified in order by default. Support for verification in order will be added in a future release.

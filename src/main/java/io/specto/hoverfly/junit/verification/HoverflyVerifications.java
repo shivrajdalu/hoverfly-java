@@ -1,5 +1,6 @@
 package io.specto.hoverfly.junit.verification;
 
+import io.specto.hoverfly.junit.core.model.Request;
 import org.apache.commons.lang3.StringUtils;
 
 public class HoverflyVerifications {
@@ -8,10 +9,10 @@ public class HoverflyVerifications {
     }
 
     public static VerificationCriteria times(int expectedNumberOfRequests) {
-        return data -> {
+        return (request, data) -> {
             int actualNumberOfRequests = getActualNumberOfRequests(data);
             if (actualNumberOfRequests != expectedNumberOfRequests) {
-                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, data);
+                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, request, data);
             }
         };
     }
@@ -21,19 +22,19 @@ public class HoverflyVerifications {
     }
 
     public static VerificationCriteria atLeast(int expectedNumberOfRequests) {
-        return data -> {
+        return (request, data) -> {
             int actualNumberOfRequests = getActualNumberOfRequests(data);
             if (actualNumberOfRequests < expectedNumberOfRequests) {
-                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, "at least", data);
+                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, request, data, "at least");
             }
         };
     }
 
     public static VerificationCriteria atMost(int expectedNumberOfRequests) {
-        return data -> {
+        return (request, data) -> {
             int actualNumberOfRequests = getActualNumberOfRequests(data);
             if (actualNumberOfRequests > expectedNumberOfRequests) {
-                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, "at most", data);
+                handleVerificationFailure(expectedNumberOfRequests, actualNumberOfRequests, request, data, "at most");
             }
         };
     }
@@ -50,11 +51,11 @@ public class HoverflyVerifications {
     }
 
 
-    private static void handleVerificationFailure(int expected, int actual, VerificationData data) {
-        handleVerificationFailure(expected, actual, "", data);
+    private static void handleVerificationFailure(int expected, int actual, Request request, VerificationData data) {
+        handleVerificationFailure(expected, actual, request, data, "");
     }
 
-    private static void handleVerificationFailure(int expected, int actual, String description, VerificationData data) {
+    private static void handleVerificationFailure(int expected, int actual, Request request, VerificationData data, String description) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -70,14 +71,19 @@ public class HoverflyVerifications {
             sb.append(expected).append(" ");
 
             if (expected > 1) {
-                sb.append("requests, ");
+                sb.append("requests:\n");
             } else {
-                sb.append("request, ");
+                sb.append("request:\n");
             }
         }
 
-        sb.append("but actual number of requests is ").append(actual).append(".");
-        sb.append("\n").append("Actual requests found: ").append("\n");
+        sb.append(request.toString()).append("\n");
+
+
+        sb.append("\n").append("But actual number of requests is ").append(actual).append(".");
+        if (actual > 0) {
+            sb.append("\n").append("Actual requests found: ").append("\n");
+        }
 
         data.getJournal().getEntries().stream()
                 .map(VerificationUtils::format)

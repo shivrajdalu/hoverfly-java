@@ -86,7 +86,10 @@ More code examples for the DSL using request matchers can be found https://githu
 hoverflyRule.verify(service(matches("*.flight.*")).get("/api/bookings").anyQueryParams(), atLeastOnce());
 
 // Verify that an external service/dependency was not called
-hoverflyRule.verifyNever(service(matches("*.flight.*")));
+hoverflyRule.verifyZeroRequestTo(service(matches("*.flight.*")));
+
+// Verify all the stubbed requests were made at least once
+hoverflyRule.verifyAll();
 
 ```
 == Contributions
