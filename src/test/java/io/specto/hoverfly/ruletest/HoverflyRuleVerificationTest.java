@@ -32,7 +32,7 @@ public class HoverflyRuleVerificationTest {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    private static SimpleBooking booking = new SimpleBooking(1, "London", "Hong Kong", LocalDate.now());
+    private static SimpleBooking booking = new SimpleBooking(1, "London", "Hong Kong", LocalDate.of(2017, 6, 29));
 
     @ClassRule
     public static HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode(dsl(
@@ -107,7 +107,6 @@ public class HoverflyRuleVerificationTest {
 
     @Test
     public void shouldThrowExceptionIfVerifyAllFailed() throws Exception {
-
 
        assertThatThrownBy(() -> hoverflyRule.verifyAll())
                .isInstanceOf(HoverflyVerificationError.class)
