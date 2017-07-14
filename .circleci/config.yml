@@ -37,9 +37,9 @@ jobs:
       - run:
           name: Download deployment dependencies
           command: |
-             - git config core.filemode false
-                  - chmod +x maven-release.sh
-                  - ./maven-release.sh
+             git config core.filemode false
+             chmod +x maven-release.sh
+             ./maven-release.sh
 
 workflows:
   version: 2
