@@ -33,7 +33,7 @@ jobs:
     working_directory: ~/hoverfly-java
     steps:
       - attach_workspace:
-          at: /home/circleci/hoverfly-java
+          at: /home/circleci
       - run:
           name: Download deployment dependencies
           command: |
