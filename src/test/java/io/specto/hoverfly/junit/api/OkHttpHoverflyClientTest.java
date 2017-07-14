@@ -6,13 +6,15 @@ import com.google.common.io.Resources;
 import io.specto.hoverfly.junit.api.model.ModeArguments;
 import io.specto.hoverfly.junit.api.view.HoverflyInfoView;
 import io.specto.hoverfly.junit.core.Hoverfly;
-import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
 import io.specto.hoverfly.junit.core.SimulationSource;
-import io.specto.hoverfly.junit.core.model.*;
+import io.specto.hoverfly.junit.core.config.HoverflyConfiguration;
+import io.specto.hoverfly.junit.core.model.FieldMatcher;
+import io.specto.hoverfly.junit.core.model.Journal;
+import io.specto.hoverfly.junit.core.model.Request;
+import io.specto.hoverfly.junit.core.model.Simulation;
 import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -25,7 +27,6 @@ import java.util.List;
 import static io.specto.hoverfly.junit.core.HoverflyMode.CAPTURE;
 import static io.specto.hoverfly.junit.core.HoverflyMode.SIMULATE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class OkHttpHoverflyClientTest {
 
@@ -106,15 +107,6 @@ public class OkHttpHoverflyClientTest {
         Simulation simulation = hoverfly.getSimulation();
 
         assertThat(simulation).isEqualTo(SimulationSource.empty().getSimulation());
-    }
-
-    @Test
-    public void shouldThrowHoverflyClientExceptionWhenTryingToSetInvalidSimulation() throws Exception {
-        Simulation invalidSimulation = new Simulation(null, null);
-
-        assertThatThrownBy(() -> client.setSimulation(invalidSimulation))
-                .isInstanceOf(HoverflyClientException.class)
-                .hasMessageContaining("Failed to set simulation: Unexpected response (code=400, message={\"error\":\"Invalid JSON, missing \\\"meta\\\" object\"})");
     }
 
     @Test

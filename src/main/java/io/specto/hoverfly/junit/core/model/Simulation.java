@@ -15,22 +15,34 @@ package io.specto.hoverfly.junit.core.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Simulation {
+
     @JsonProperty("data")
-    private final HoverflyData hoverflyData;
+    private HoverflyData hoverflyData;
+
     @JsonProperty("meta")
-    private final HoverflyMetaData hoverflyMetaData;
+    private HoverflyMetaData hoverflyMetaData;
 
     @JsonCreator
     public Simulation(@JsonProperty("data") HoverflyData hoverflyData,
                       @JsonProperty("meta") HoverflyMetaData hoverflyMetaData) {
+
+        if (hoverflyData == null) {
+             hoverflyData = new HoverflyData(new HashSet<>(), new GlobalActions(new ArrayList<>()));
+        }
+
+        if (hoverflyMetaData == null) {
+            hoverflyMetaData = new HoverflyMetaData();
+        }
+
         this.hoverflyData = hoverflyData;
         this.hoverflyMetaData = hoverflyMetaData;
     }

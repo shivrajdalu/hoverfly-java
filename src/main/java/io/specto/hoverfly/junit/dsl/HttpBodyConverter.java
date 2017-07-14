@@ -10,12 +10,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * Interface for converting a java object into a http request body, and storing the appropriate content type header value
  */
 public interface HttpBodyConverter {
-    /**
-     * Converts a given object into json, and returns application/json content type
-     *
-     * @param body the body of the request or response
-     * @return the converter
-     */
 
     ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -28,6 +22,12 @@ public interface HttpBodyConverter {
     String APPLICATION_JSON = "application/json";
     String APPLICATION_XML = "application/xml";
 
+    /**
+     * Converts a given object into json, and returns application/json content type
+     *
+     * @param body the body of the request or response
+     * @return the converter
+     */
     static HttpBodyConverter json(final Object body) {
         return json(body, OBJECT_MAPPER);
     }

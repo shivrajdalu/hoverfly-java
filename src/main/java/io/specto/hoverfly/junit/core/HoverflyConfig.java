@@ -74,6 +74,7 @@ public abstract class HoverflyConfig {
 
     /**
      * Controls whether we want to proxy localhost.  If false then any request to localhost will not be proxied through {@link Hoverfly}.
+     * @param proxyLocalHost true if you want to proxy requests through localhost
      * @return the {@link HoverflyConfig} for further customizations
      */
     @Deprecated
