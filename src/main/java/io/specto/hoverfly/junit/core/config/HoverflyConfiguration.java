@@ -141,23 +141,23 @@ public class HoverflyConfiguration {
         return captureHeaders;
     }
 
-    void setHost(String host) {
+    public void setHost(String host) {
         if (host != null) {
             this.host = host;
         }
     }
 
-    void setScheme(String scheme) {
+   public void setScheme(String scheme) {
         if (scheme != null) {
             this.scheme = scheme;
         }
     }
 
-    void setProxyPort(int proxyPort) {
+   public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
     }
 
-    void setAdminPort(int adminPort) {
+   public void setAdminPort(int adminPort) {
         this.adminPort = adminPort;
     }
 
